@@ -1,6 +1,7 @@
 from pickle import dump, load
 from os import listdir, remove
 from datetime import datetime
+from googletrans import Translator
 
 
 def getAddress(name: str) -> str:
@@ -198,8 +199,26 @@ def sortDictionary(dictionary: dict, console=False) -> dict:
 	return dict(sorted(dictionary.items()))
 
 
+def setLanguages(word, console=False):
+	languages = word.split(', ')
+	if console:
+		print("Translation languages set to", languages)
+	return languages
+
+
+def multiTranslate(word, translationLanguages):
+	words = word.split(', ')
+	for w in words:
+		output = 'English: ' + w + ', \t'
+		for destL in translationLanguages:
+			output += destL + ': '
+			output += translator.translate(text=w, src='English', dest=destL).text + ', \t'
+		print(output)
+
+
 def console():
 	dictionary = ''
+	translationLanguages = []
 
 	while True:
 		# Get the command input
@@ -274,6 +293,14 @@ def console():
 				editEntry(dictionary, word, True)
 				continue
 
+			if command == 'setlanguages' or command == 'sl':
+				translationLanguages = setLanguages(word, True)
+				continue
+
+			if command == 'translate' or command == 't':
+				multiTranslate(word, translationLanguages)
+				continue
+
 		print("unknown commands")
 
 
@@ -283,9 +310,8 @@ DIRECTORY = 'dictionaries/'
 EXTENSION = '.pkl'
 NAMEKEY = 'NAME'
 COLUMNFORMATKEY = 'COLUMN FORMAT'
+translator = Translator()
 
 console()
-
-columnFormat = ['English Trans.', 'Part of speech', 'Phono. Transc.', 'Extra Descr.']
 
 print("FULL RUNNING TIME: " + str(datetime.now() - timeFull))
